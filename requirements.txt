@@ -1,0 +1,16 @@
+# Secure StegoSuite v2 — dependencies
+flask>=3.0
+werkzeug>=3.0
+cryptography>=42.0
+argon2-cffi>=23.1          # memory-hard KDF (Argon2id)
+numpy>=1.24
+opencv-python-headless>=4.8
+gunicorn>=21.0            # production WSGI server
+
+# Optional — enables REAL post-quantum (ML-KEM/Kyber) instead of the X25519
+# emulation fallback. Requires liboqs on the system.
+#   pip install liboqs-python
+# liboqs-python>=0.10
+
+# Dev / testing
+# pytest>=7.4

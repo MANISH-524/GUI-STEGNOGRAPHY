@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+uploads/
+.env
+.git/
+tests/
+*.bak

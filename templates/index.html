@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure StegoSuite | Crypto & Steganography</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --container-bg: rgba(20, 25, 40, 0.7);
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --text-main: #ffffff;
+            --text-muted: #8892b0;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(79, 172, 254, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 242, 254, 0.15), transparent 25%);
+            color: var(--text-main);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: var(--container-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: none;
+            border-radius: 0;
+            padding: 4rem 15vw;
+            width: 100vw;
+            min-height: 100vh;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+            border-radius: 12px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input[type="file"],
+        input[type="password"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"]:hover,
+        input[type="password"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.1);
+        }
+
+        .crypto-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .radio-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .radio-card input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .radio-card.selected {
+            border-color: var(--primary);
+            background: rgba(0, 242, 254, 0.05);
+        }
+
+        .radio-card.selected::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--secondary), var(--primary));
+        }
+
+        .radio-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            color: #fff;
+        }
+
+        .radio-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 20px -10px rgba(0, 242, 254, 0.5);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -10px rgba(0, 242, 254, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: #2ecc71;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        #result.error {
+            background: rgba(231, 76, 60, 0.1);
+            border-color: rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.8rem 1.5rem;
+            background: #2ecc71;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #27ae60;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--secondary);
+            background: rgba(79, 172, 254, 0.05);
+        }
+
+        .upload-area input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .file-name {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Secure StegoSuite</h1>
+            <p>Advanced Hybrid Cryptography + LSB Steganography</p>
+        </div>
+
+        <div class="tabs mode-tabs">
+            <div class="tab active" data-mode="encrypt">Encrypt & Embed</div>
+            <div class="tab" data-mode="decrypt" style="background: rgba(0,0,0,0.3);">Decrypt & Extract</div>
+        </div>
+
+        <div
+            style="text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text-muted); font-weight: 600;">
+            Media Type</div>
+        <div class="tabs media-tabs">
+            <div class="tab active" data-action="audio_audio">Audio Data</div>
+            <div class="tab" data-action="audio_image">Image Data</div>
+            <div class="tab" data-action="audio_video">Video Data</div>
+            <div class="tab" data-action="text_text">Text Data</div>
+        </div>
+
+        <form id="stegoForm" enctype="multipart/form-data">
+            <input type="hidden" id="action_type" name="action_type" value="audio_audio">
+            <input type="hidden" id="mode" name="mode" value="encrypt">
+
+            <div id="file-group-encrypt">
+                <div class="form-group">
+                    <label>1. Select Cover File (<span id="cover-ext">.wav</span>)</label>
+                    <div class="upload-area">
+                        <p>Drag & drop or click to select cover file</p>
+                        <input type="file" name="cover" id="cover" required>
+                        <span class="file-name" id="cover-name">No file selected</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>2. Select Secret File (Any format)</label>
+                    <div class="upload-area">
+                        <p>Drag & drop or click to select secret file</p>
+                        <input type="file" name="secret" id="secret" required>
+                        <span class="file-name" id="secret-name">No file selected</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="file-group-decrypt" style="display: none;">
+                <div class="form-group">
+                    <label>1. Select Stego File (<span id="stego-ext">.wav, .png, .avi, .txt</span>)</label>
+                    <div class="upload-area" style="border-color: var(--primary);">
+                        <p>Drag & drop or click to select Stego file</p>
+                        <input type="file" name="stego" id="stego">
+                        <span class="file-name" id="stego-name">No file selected</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Encryption Password / Key</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="password" name="password" id="password" placeholder="Enter a strong password" required>
+                    <button type="button" id="generate-pw-btn" class="btn"
+                        style="width: auto; padding: 0 1rem; font-size: 0.9rem;">Auto-Gen</button>
+                    <button type="button" id="toggle-pw-btn" class="btn"
+                        style="width: auto; padding: 0 1rem; font-size: 0.9rem; background: rgba(255,255,255,0.1); color: #fff; box-shadow: none;">Show</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Hybrid Encryption Method</label>
+                <div class="crypto-options">
+                    <label class="radio-card selected">
+                        <input type="radio" name="method" value="aes_ecc" checked>
+                        <span class="radio-title">AES 256 + ECC</span>
+                        <span class="radio-desc">Derived SHA-256 for AES, plus ECC P-256.</span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="method" value="aes_rsa">
+                        <span class="radio-title">AES 256 + RSA 2048</span>
+                        <span class="radio-desc">Derived SHA-256 for AES, plus RSA-2048.</span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="method" value="chacha20_ecc">
+                        <span class="radio-title">ChaCha20 + ECC</span>
+                        <span class="radio-desc">Modern Stream Cipher with Elliptic Curve DH.</span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="method" value="aes_chacha20_cascade">
+                        <span class="radio-title">Cascaded (AES+ChaCha20)</span>
+                        <span class="radio-desc">Dual cascaded encryption for extreme paranoia.</span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="method" value="kyber_aes">
+                        <span class="radio-title">AES + Post-Quantum</span>
+                        <span class="radio-desc">Simulated CRYSTALS-Kyber KEM wrapper.</span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="method" value="aes_shamir">
+                        <span class="radio-title">AES + Shamir's Splitting</span>
+                        <span class="radio-desc">Splits the key via polynomials for threshold recovery.</span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="method" value="aes_elgamal">
+                        <span class="radio-title">AES + ElGamal/DH</span>
+                        <span class="radio-desc">Classic Diffie-Hellman discrete-log wrapper.</span>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                <span class="spinner" id="spinner"></span>
+                <span id="btnText">Encrypt & Embed Data</span>
+            </button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Media Tab Switching Logic
+        const mediaTabs = document.querySelectorAll('.media-tabs .tab');
+        const actionInput = document.getElementById('action_type');
+        const coverExt = document.getElementById('cover-ext');
+
+        mediaTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                mediaTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                actionInput.value = tab.getAttribute('data-action');
+
+                let ext = '';
+                if (actionInput.value === 'audio_audio') ext = '.wav';
+                if (actionInput.value === 'audio_image') ext = '.png, .bmp';
+                if (actionInput.value === 'audio_video') ext = '.avi';
+                if (actionInput.value === 'text_text') ext = '.txt';
+
+                coverExt.innerText = ext;
+            });
+        });
+
+        // Mode Tab Switching Logic
+        const modeTabs = document.querySelectorAll('.mode-tabs .tab');
+        const modeInput = document.getElementById('mode');
+        const fileGroupEncrypt = document.getElementById('file-group-encrypt');
+        const fileGroupDecrypt = document.getElementById('file-group-decrypt');
+        const btnText = document.getElementById('btnText');
+
+        modeTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                modeTabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.style.background = 'rgba(0,0,0,0.3)';
+                });
+                tab.classList.add('active');
+                tab.style.background = 'linear-gradient(135deg, var(--secondary), var(--primary))';
+
+                modeInput.value = tab.getAttribute('data-mode');
+
+                if (modeInput.value === 'encrypt') {
+                    fileGroupEncrypt.style.display = 'block';
+                    fileGroupDecrypt.style.display = 'none';
+                    btnText.innerText = 'Encrypt & Embed Data';
+                    document.getElementById('cover').required = true;
+                    document.getElementById('secret').required = true;
+                    document.getElementById('stego').required = false;
+                } else {
+                    fileGroupEncrypt.style.display = 'none';
+                    fileGroupDecrypt.style.display = 'block';
+                    btnText.innerText = 'Extract & Decrypt Data';
+                    document.getElementById('cover').required = false;
+                    document.getElementById('secret').required = false;
+                    document.getElementById('stego').required = true;
+                }
+            });
+        });
+
+        // Radio Button Styling Logic
+        const radios = document.querySelectorAll('input[name="method"]');
+        radios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                document.querySelectorAll('.radio-card').forEach(card => card.classList.remove('selected'));
+                e.target.closest('.radio-card').classList.add('selected');
+            });
+        });
+
+        // File Input Name Display
+        document.getElementById('cover').addEventListener('change', function () {
+            document.getElementById('cover-name').innerText = this.files.length > 0 ? this.files[0].name : 'No file selected';
+        });
+        document.getElementById('secret').addEventListener('change', function () {
+            document.getElementById('secret-name').innerText = this.files.length > 0 ? this.files[0].name : 'No file selected';
+        });
+        document.getElementById('stego').addEventListener('change', function () {
+            document.getElementById('stego-name').innerText = this.files.length > 0 ? this.files[0].name : 'No file selected';
+        });
+
+        // Password logic
+        document.getElementById('generate-pw-btn').addEventListener('click', () => {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=';
+            let pw = '';
+            for (let i = 0; i < 24; i++) pw += chars.charAt(Math.floor(Math.random() * chars.length));
+            const pwInput = document.getElementById('password');
+            pwInput.value = pw;
+            pwInput.type = 'text';
+            document.getElementById('toggle-pw-btn').innerText = 'Hide';
+        });
+
+        document.getElementById('toggle-pw-btn').addEventListener('click', () => {
+            const pwInput = document.getElementById('password');
+            if (pwInput.type === 'password') {
+                pwInput.type = 'text';
+                document.getElementById('toggle-pw-btn').innerText = 'Hide';
+            } else {
+                pwInput.type = 'password';
+                document.getElementById('toggle-pw-btn').innerText = 'Show';
+            }
+        });
+
+        // Form Submission Logic
+        const form = document.getElementById('stegoForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('spinner');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            submitBtn.disabled = true;
+            spinner.style.display = 'block';
+            let originalText = btnText.innerText;
+            btnText.innerText = 'Processing...';
+            resultDiv.style.display = 'none';
+            resultDiv.className = '';
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    let integrityHtml = '';
+                    if (data.integrity_verified !== undefined) {
+                        if (data.integrity_verified) {
+                            integrityHtml = `<div style="margin-top: 15px; padding: 10px; background: rgba(0, 255, 0, 0.1); border: 1px solid #00ff00; border-radius: 8px; color: #00ff00;">
+                                ✅ <strong>File Integrity: VERIFIED</strong> (No tampering detected)
+                            </div>`;
+                        } else {
+                            integrityHtml = `<div style="margin-top: 15px; padding: 10px; background: rgba(255, 0, 0, 0.1); border: 1px solid #ff0000; border-radius: 8px; color: #ff0000;">
+                                ⚠️ <strong>File Integrity: UNKNOWN / TAMPERED</strong> (Hash not found in Ledger)
+                            </div>`;
+                        }
+                    }
+
+                    resultDiv.innerHTML = `
+                        <strong>Success!</strong> ${data.message} <br>
+                        <a href="${data.download_url}" class="download-btn">Download Output File</a>
+                        ${integrityHtml}
+                    `;
+                    resultDiv.classList.add('success');
+                } else {
+                    resultDiv.innerHTML = `<strong>Error:</strong> ${data.error}`;
+                    resultDiv.classList.add('error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>Error:</strong> Failed to connect to server. ${error.message}`;
+                resultDiv.classList.add('error');
+            } finally {
+                resultDiv.style.display = 'block';
+                submitBtn.disabled = false;
+                spinner.style.display = 'none';
+                btnText.innerText = originalText;
+            }
+        });
+    </script>
+</body>
+
+</html>
